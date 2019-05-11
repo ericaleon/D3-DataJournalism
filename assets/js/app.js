@@ -72,17 +72,15 @@ d3.csv("assets/data/data.csv")
         .attr("r", "12")
         .attr("fill", "gray")
         .attr("opacity", ".5");
-        // .append("text")
-        // .attr("x", data => xLinearScale(data.income) - 10)
-        // .attr("y", data => yLinearScale(data.obesity) + 5)
-        // .text(data => data.abbr);
 
-    // circlesGroup.append("circle")
-    //     .attr("cx", data => xLinearScale(data.income))
-    //     .attr("cy", data => yLinearScale(data.obesity))
-    //     .attr("r", "12")
-    //     .attr("fill", "gray")
-    //     .attr("opacity", ".5");
+    var textGroup = chartGroup.selectAll("tspan") // use tspan - look up more
+      .data(data)
+      .enter()
+      .append("text")
+      .attr("x", data => xLinearScale(data.income)) // tweak using dx/dy
+      .attr("y", data => yLinearScale(data.obesity))
+      .text(data => data.abbr);
+
 
     // //Adding abbreviations to circles; not working with the tips.
     // circlesGroup.append("text")
