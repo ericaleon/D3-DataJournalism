@@ -28,8 +28,7 @@ var chartGroup = svg.append("g")
 d3.csv("assets/data/data.csv")
   .then(function(data) {
 
-    // Step 1: Parse Data/Cast as numbers
-    // ==============================
+    // Parse Data and cast as numbers
     data.forEach(function(d) {
       d.income = +d.income;
       d.obesity = +d.obesity;
@@ -37,23 +36,20 @@ d3.csv("assets/data/data.csv")
 
     // console.log("I made it past CSV read/parse");
 
-    // Step 2: Create scale functions
-    // ==============================
+    // Create scale functions
     var xLinearScale = d3.scaleLinear()
-      .domain([35000, d3.max(data, d => d.income)])
+      .domain([38000, d3.max(data, d => d.income)])
       .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
-      .domain([18, d3.max(data, d => d.obesity)])
+      .domain([20, d3.max(data, d => d.obesity)])
       .range([height, 0]);
 
-    // Step 3: Create axis functions
-    // ==============================
+    // Create axis functions
     var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
 
-    // Step 4: Append Axes to the chart
-    // ==============================
+    // Append Axes to the chart
     chartGroup.append("g")
       .attr("transform", `translate(0, ${height})`)
       .call(bottomAxis);
@@ -61,35 +57,30 @@ d3.csv("assets/data/data.csv")
     chartGroup.append("g")
       .call(leftAxis);
 
-    // Step 5: Create Circles
-    // ==============================
+    // Set up circles based on income vs obesity
     var circlesGroup = chartGroup.selectAll("circle")
         .data(data)
         .enter()
         .append("circle")
+        .attr("class", "stateCircle")
         .attr("cx", data => xLinearScale(data.income))
         .attr("cy", data => yLinearScale(data.obesity))
         .attr("r", "12")
         .attr("fill", "gray")
         .attr("opacity", ".5");
 
-    var textGroup = chartGroup.selectAll("tspan") // use tspan - look up more
+    // Set up state abbreviation text to align with circles
+    var textGroup = chartGroup.selectAll("tspan")
       .data(data)
       .enter()
       .append("text")
-      .attr("x", data => xLinearScale(data.income)) // tweak using dx/dy
-      .attr("y", data => yLinearScale(data.obesity))
+      .attr("class", "stateText")
+      .attr("x", data => xLinearScale(data.income))
+      .attr("y", data => yLinearScale(data.obesity) +6)
       .text(data => data.abbr);
 
 
-    // //Adding abbreviations to circles; not working with the tips.
-    // circlesGroup.append("text")
-    //     .attr("x", data => xLinearScale(data.income) - 10)
-    //     .attr("y", data => yLinearScale(data.obesity) + 5)
-    //     .text(data => data.abbr);
-
-    // Step 6: Initialize tool tip
-    // ==============================
+    // Initialize tool tip
     var toolTip = d3.tip()
       .attr("class", "d3-tip")
       .offset([80, -60])
@@ -97,12 +88,10 @@ d3.csv("assets/data/data.csv")
         return (`${d.abbr}<br>Income: ${d.income}<br>Obesity: ${d.obesity}`);
       });
 
-    // Step 7: Create tooltip in the chart
-    // ==============================
+    // Create tooltip in the chart    
     chartGroup.call(toolTip);
 
-    // Step 8: Create event listeners to display and hide the tooltip
-    // ==============================
+    // Create event listeners for displaying and hiding the tooltip
     circlesGroup.on("mouseover", function(data) {
       toolTip.show(data, this);
     })
